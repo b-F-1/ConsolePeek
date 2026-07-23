@@ -12,8 +12,6 @@ for 1.21.x) and Maven.
 mvn clean package
 ```
 
-The finished jar lands at `target/ConsolePeek.jar`.
-
 ## Install
 
 1. Drop `ConsolePeek.jar` into your server's `plugins/` folder.

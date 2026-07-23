@@ -5,7 +5,7 @@ main: com.example.consolepeek.ConsolePeekPlugin
 # nothing version-specific.
 api-version: '1.21'
 description: Prints the last X lines of the server console into chat.
-author: you
+author: b-F-1, with help from Claude.
 
 commands:
   console:
