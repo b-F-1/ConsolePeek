@@ -1,0 +1,13 @@
+# ConsolePeek configuration
+# After editing, run /consolepeek reload (or restart the server) to apply.
+
+# true  = only operators (and anyone with consolepeek.use) can run /console
+# false = everyone can run it
+#
+# Heads up: the console logs player IP addresses, stack traces, and admin
+# actions. Setting this to false lets any player read all of that.
+ops-only: true
+
+# Hard cap on how many lines a single /console call will print.
+# Keeps someone from dumping thousands of lines into chat.
+max-lines: 100

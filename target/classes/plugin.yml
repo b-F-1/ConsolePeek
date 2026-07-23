@@ -1,7 +1,8 @@
 name: ConsolePeek
 version: 1.0.0
 main: com.example.consolepeek.ConsolePeekPlugin
-# If your server rejects this value, set it to match your version (e.g. '1.21').
+# If your server rejects this value, delete this line — the plugin uses
+# nothing version-specific.
 api-version: '1.21'
 description: Prints the last X lines of the server console into chat.
 author: you
@@ -10,5 +11,17 @@ commands:
   console:
     description: Show the last X lines of the server console.
     usage: /console <lines>
-    # No 'permission' set here means everyone can use it (what you asked for).
-    # To restrict it later, see the note in README.md.
+  consolepeek:
+    description: ConsolePeek admin commands.
+    usage: /consolepeek reload
+    permission: consolepeek.admin
+
+permissions:
+  consolepeek.use:
+    description: Allows use of /console.
+    # 'op' means operators have it by default. When ops-only is false in
+    # config.yml the permission check is skipped entirely.
+    default: op
+  consolepeek.admin:
+    description: Allows reloading the ConsolePeek config.
+    default: op
