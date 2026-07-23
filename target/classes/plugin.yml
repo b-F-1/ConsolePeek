@@ -1,0 +1,14 @@
+name: ConsolePeek
+version: 1.0.0
+main: com.example.consolepeek.ConsolePeekPlugin
+# If your server rejects this value, set it to match your version (e.g. '1.21').
+api-version: '1.21'
+description: Prints the last X lines of the server console into chat.
+author: you
+
+commands:
+  console:
+    description: Show the last X lines of the server console.
+    usage: /console <lines>
+    # No 'permission' set here means everyone can use it (what you asked for).
+    # To restrict it later, see the note in README.md.
