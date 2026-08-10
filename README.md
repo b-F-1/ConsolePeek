@@ -12,6 +12,8 @@ for 1.21.x) and Maven.
 mvn clean package
 ```
 
+The finished jar lands at `target/ConsolePeek.jar`.
+
 ## Install
 
 1. Drop `ConsolePeek.jar` into your server's `plugins/` folder.
@@ -41,10 +43,46 @@ mvn clean package
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `ops-only` | `true` | Require the `consolepeek.use` permission (ops have it by default). |
-| `max-lines` | `100` | Hard cap on lines printed per command. |
+| `ops-only` | `true` | Require the `consolepeek.use` permission for `/console` (ops have it by default). |
+| `max-lines` | `100` | Cap on lines printed by `/console` and logins returned by `/consolepeek login`. |
+| `login-match` | `logged in with entity id` | The log marker that counts as a successful login. |
+| `login-max-files` | `60` | How many log files (newest first) `/consolepeek login` may read through. |
 
 Apply changes with `/consolepeek reload` — no restart, no recompile.
+
+## Commands
+
+| Command | Who | What |
+| --- | --- | --- |
+| `/console <lines>` | everyone or ops (per `ops-only`) | Last N raw console lines. |
+| `/consolepeek login <count>` | ops (`consolepeek.admin`) | Last N logins as `date time  username`. |
+| `/consolepeek reload` | ops (`consolepeek.admin`) | Reload `config.yml`. |
+
+### /consolepeek login
+
+Returns the most recent N logins, cleaned to just timestamp and username, e.g.:
+
+```
+---- last 3 login(s) ----
+2026-07-17 11:00:00  Delta
+2026-07-18 12:00:00  Echo
+2026-07-18 13:00:00  Foxtrot
+```
+
+It searches backward through the logs — `latest.log` first, then the dated
+`.log.gz` archives newest-first — until it has N logins or runs out of files
+(bounded by `login-max-files`). Dates for archived lines come from the archive
+filename; lines in `latest.log` are dated to the current day.
+
+Notes:
+- Only successful logins are listed. Failed/aborted attempts usually disconnect
+  before authenticating and carry no username, so they can't be shown as
+  `username + timestamp`; they're skipped.
+- It's op-only (`consolepeek.admin`) because these lines are derived from entries
+  that include player IPs. To loosen it, give the `consolepeek` command its own
+  permission in `plugin.yml`.
+- `latest.log` uses the current date. If the server ran across midnight without
+  rotating, times before midnight will be labelled with today's date.
 
 ## Permissions
 

@@ -8,6 +8,21 @@
 # actions. Setting this to false lets any player read all of that.
 ops-only: true
 
-# Hard cap on how many lines a single /console call will print.
-# Keeps someone from dumping thousands of lines into chat.
+# Hard cap on how many lines /console prints and how many logins
+# /consolepeek login will return in one call.
 max-lines: 100
+
+# ----- /consolepeek login settings -----
+
+# The marker that identifies a successful-login line. The player name is read
+# from just before the [/ip:port] token on that line, and the time from the
+# line's [HH:mm:ss] stamp. Matched case-insensitively. The default is the
+# vanilla/Paper "logged in with entity id" line, which is emitted once per
+# successful join and is the only line that reliably carries both name and time.
+login-match: "logged in with entity id"
+
+# How many log files the login search may read through, newest first
+# (latest.log first, then dated .log.gz archives). Raise it to reach further
+# back into history; lower it to bound disk work. The search also stops early
+# as soon as it has collected enough logins to satisfy your requested count.
+login-max-files: 60

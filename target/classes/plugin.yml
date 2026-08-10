@@ -13,7 +13,7 @@ commands:
     usage: /console <lines>
   consolepeek:
     description: ConsolePeek admin commands.
-    usage: /consolepeek reload
+    usage: /consolepeek reload | /consolepeek login <lines>
     permission: consolepeek.admin
 
 permissions:
