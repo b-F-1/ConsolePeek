@@ -56,6 +56,7 @@ Apply changes with `/consolepeek reload` — no restart, no recompile.
 | --- | --- | --- |
 | `/console <lines>` | everyone or ops (per `ops-only`) | Last N raw console lines. |
 | `/consolepeek login <count>` | ops (`consolepeek.admin`) | Last N logins as `date time  username`. |
+| `/console login <count>` | ops (`consolepeek.admin`) | Alias for `/consolepeek login`. |
 | `/consolepeek reload` | ops (`consolepeek.admin`) | Reload `config.yml`. |
 
 ### /consolepeek login
@@ -74,6 +75,9 @@ It searches backward through the logs — `latest.log` first, then the dated
 (bounded by `login-max-files`). Dates for archived lines come from the archive
 filename; lines in `latest.log` are dated to the current day.
 
+`/console login <count>` is a convenience alias for the same thing, and stays
+op-gated even though `/console` itself may be open to everyone.
+
 Notes:
 - Only successful logins are listed. Failed/aborted attempts usually disconnect
   before authenticating and carry no username, so they can't be shown as
@@ -83,6 +87,10 @@ Notes:
   permission in `plugin.yml`.
 - `latest.log` uses the current date. If the server ran across midnight without
   rotating, times before midnight will be labelled with today's date.
+
+## Tab completion
+
+Tab-completing `/console` or `/consolepeek` suggests only the real subcommands (`login`, `reload`) and nothing for the numeric/count argument. It deliberately does **not** fall back to suggesting online player names, which is Bukkit's default behaviour for command arguments.
 
 ## Permissions
 

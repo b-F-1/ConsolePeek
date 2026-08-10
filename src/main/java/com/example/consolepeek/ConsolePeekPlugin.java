@@ -4,8 +4,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,6 +31,10 @@ import java.util.zip.GZIPInputStream;
 public final class ConsolePeekPlugin extends JavaPlugin {
 
     public static final String USE_PERMISSION = "consolepeek.use";
+    public static final String ADMIN_PERMISSION = "consolepeek.admin";
+
+    private static final List<String> CONSOLE_SUBS = List.of("login");
+    private static final List<String> CONSOLEPEEK_SUBS = List.of("login", "reload");
 
     private static final Path LOGS_DIR = Path.of("logs");
     private static final Path LATEST_LOG = LOGS_DIR.resolve("latest.log");
@@ -50,6 +56,20 @@ public final class ConsolePeekPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        register("console");
+        register("consolepeek");
+    }
+
+    private void register(String name) {
+        final PluginCommand cmd = getCommand(name);
+        if (cmd == null) {
+            getLogger().warning("Command '" + name + "' is missing from plugin.yml");
+            return;
+        }
+        cmd.setExecutor(this);
+        // Setting our own completer stops Bukkit's default from suggesting
+        // online player names for these commands' arguments.
+        cmd.setTabCompleter(this);
     }
 
     @Override
@@ -59,6 +79,29 @@ public final class ConsolePeekPlugin extends JavaPlugin {
             return handleAdmin(sender, args);
         }
         return handleConsole(sender, args);
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+                                                @NotNull String label, @NotNull String[] args) {
+        // Always return a (possibly empty) list, never null: returning null lets
+        // Bukkit fall back to suggesting online player names, which we don't want.
+        final boolean isPeek = command.getName().equalsIgnoreCase("consolepeek");
+        if (args.length == 1) {
+            return prefixMatches(isPeek ? CONSOLEPEEK_SUBS : CONSOLE_SUBS, args[0]);
+        }
+        return List.of();
+    }
+
+    private static List<String> prefixMatches(List<String> options, String typed) {
+        final String p = typed.toLowerCase(Locale.ROOT);
+        final List<String> out = new ArrayList<>();
+        for (String o : options) {
+            if (o.toLowerCase(Locale.ROOT).startsWith(p)) {
+                out.add(o);
+            }
+        }
+        return out;
     }
 
     // ---- /consolepeek <sub> (ops only via consolepeek.admin) ---------------
@@ -211,6 +254,22 @@ public final class ConsolePeekPlugin extends JavaPlugin {
     // ---- /console <lines> --------------------------------------------------
 
     private boolean handleConsole(CommandSender sender, String[] args) {
+        // /console login <count> is an alias for /consolepeek login <count>.
+        // It keeps the stricter admin gate, since login output is IP-derived.
+        if (args.length >= 1 && args[0].equalsIgnoreCase("login")) {
+            if (!sender.hasPermission(ADMIN_PERMISSION)) {
+                sender.sendMessage(Component.text(
+                        "You don't have permission to view logins.", NamedTextColor.RED));
+                return true;
+            }
+            if (args.length != 2) {
+                sender.sendMessage(Component.text(
+                        "Usage: /console login <count>", NamedTextColor.RED));
+                return true;
+            }
+            return handleLogin(sender, args[1]);
+        }
+
         final boolean opsOnly = getConfig().getBoolean("ops-only", true);
         if (opsOnly && !sender.hasPermission(USE_PERMISSION)) {
             sender.sendMessage(Component.text(
@@ -218,7 +277,8 @@ public final class ConsolePeekPlugin extends JavaPlugin {
             return true;
         }
         if (args.length != 1) {
-            sender.sendMessage(Component.text("Usage: /console <lines>", NamedTextColor.RED));
+            sender.sendMessage(Component.text(
+                    "Usage: /console <lines>  |  /console login <count>", NamedTextColor.RED));
             return true;
         }
         final int count = parseCount(sender, args[0]);

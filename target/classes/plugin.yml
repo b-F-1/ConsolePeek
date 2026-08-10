@@ -9,8 +9,8 @@ author: you
 
 commands:
   console:
-    description: Show the last X lines of the server console.
-    usage: /console <lines>
+    description: Show the last X console lines, or recent logins.
+    usage: /console <lines> | /console login <count>
   consolepeek:
     description: ConsolePeek admin commands.
     usage: /consolepeek reload | /consolepeek login <lines>
@@ -23,5 +23,5 @@ permissions:
     # config.yml the permission check is skipped entirely.
     default: op
   consolepeek.admin:
-    description: Allows reloading the ConsolePeek config.
+    description: Allows viewing logins and reloading the ConsolePeek config.
     default: op
